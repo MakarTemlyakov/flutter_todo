@@ -13,8 +13,8 @@ class TaskModel with ChangeNotifier {
     if (text.isEmpty) return;
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(GroupAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(TaskAdapter());
-    final groupBox = await Hive.openBox<Group>('group');
-    final taskBox = await Hive.openBox<Task>('task');
+    final groupBox = await Hive.openBox<Group>('groups');
+    final taskBox = await Hive.openBox<Task>('tasks');
     final task = Task(description: text, isDone: isDone);
 
     await taskBox.add(task);

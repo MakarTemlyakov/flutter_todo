@@ -7,10 +7,11 @@ import 'package:todo_list/domain/Task.dart';
 class TaskListModel extends ChangeNotifier {
   int groupKey;
   late final Box<Group> _groupBox;
+  late final Box<Task> _taskBox;
   Group? _group;
+  List<Task> _tasks = [];
   Group? get group => _group;
-  var _tasks = <Task>[];
-  List<Task> get tasks => _tasks.toList();
+  List<Task> get tasks => _tasks;
 
   TaskListModel({required this.groupKey}) {
     _setup();
@@ -24,15 +25,32 @@ class TaskListModel extends ChangeNotifier {
 
   void _setup() async {
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(GroupAdapter());
+    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(TaskAdapter());
     _groupBox = await Hive.openBox<Group>('groups');
+    _taskBox = await Hive.openBox<Task>('tasks');
+
     _loadGroup();
     _setupListner();
   }
 
   void _setupListner() async {
     final box = await _groupBox;
+    final taskBox = await _taskBox;
+
     _readTasks();
+    taskBox.listenable().addListener(_readTasks);
     box.listenable(keys: [groupKey]).addListener(_readTasks);
+  }
+
+  void toggleStatus(int taskIndex) {
+    var taskStatus = _group?.tasks?[taskIndex].isDone;
+    if (taskStatus == true) {
+      taskStatus = false;
+    } else {
+      taskStatus = true;
+    }
+    _group?.tasks?[taskIndex].isDone = taskStatus;
+    _readTasks();
   }
 
   void redirectToForm(BuildContext context) {
@@ -44,7 +62,7 @@ class TaskListModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _deleteTask(int taskIndex) async {
+  void deleteTask(int taskIndex) async {
     _group?.tasks?.deleteFromHive(taskIndex);
   }
 }
@@ -56,10 +74,5 @@ class TaskListModelProvider extends InheritedNotifier<TaskListModel> {
 
   static TaskListModelProvider? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<TaskListModelProvider>();
-  }
-
-  @override
-  bool updateShouldNotify(TaskListModelProvider oldWidget) {
-    return true;
   }
 }

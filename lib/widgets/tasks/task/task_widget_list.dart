@@ -82,13 +82,16 @@ class _TaskWidgetRow extends StatelessWidget {
     final model = TaskListModelProvider.of(context)?.notifier;
     final task =
         model?.tasks[indexInList] ?? Task(description: '1', isDone: false);
+    final iconStatus = model?.group?.tasks?[indexInList].isDone == true
+        ? Icon(Icons.done)
+        : null;
     return Slidable(
       key: ValueKey(indexInList),
       endActionPane: ActionPane(
         motion: ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: null,
+            onPressed: (BuildContext context) => model?.deleteTask(indexInList),
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
@@ -105,11 +108,12 @@ class _TaskWidgetRow extends StatelessWidget {
       ),
       child: Material(
         child: InkWell(
+          onDoubleTap: () => model?.toggleStatus(indexInList),
           child: ColoredBox(
             color: Color.fromRGBO(46, 46, 46, 1),
             child: ListTile(
-                onTap: () => Navigator.pushNamed(context, '/groups/tasks/form'),
-                trailing: Icon(Icons.chevron_right),
+                onTap: () => model?.redirectToForm(context),
+                trailing: iconStatus,
                 iconColor: Color.fromRGBO(132, 132, 132, 0.50),
                 title: Text(task.description,
                     style: TextStyle(color: Colors.white))),

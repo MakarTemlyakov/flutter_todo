@@ -4,7 +4,7 @@ import 'package:todo_list/domain/Task.dart';
 part 'Group.g.dart';
 
 @HiveType(typeId: 1)
-class Group {
+class Group extends HiveObject {
   @HiveField(0)
   String name;
 
@@ -16,5 +16,6 @@ class Group {
   void addTask(Box<Task> box, Task task) {
     tasks ??= HiveList(box);
     tasks?.add(task);
+    task.save();
   }
 }

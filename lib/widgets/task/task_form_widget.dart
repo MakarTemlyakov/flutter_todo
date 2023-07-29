@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/widgets/task/task_form_widget_model.dart';
+import 'package:todo_list/widgets/tasks/task/task_widget_list_model.dart';
 
 class TaskFormWidget extends StatefulWidget {
   const TaskFormWidget({Key? key}) : super(key: key);
@@ -24,7 +25,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
   @override
   Widget build(BuildContext context) {
     return TaskModelProvider(model: _taskModel!, child: _TaskFormWidgetBody());
-    ;
   }
 }
 
@@ -33,6 +33,7 @@ class _TaskFormWidgetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final taskModel = TaskModelProvider.read(context)?.notifier;
     return Scaffold(
       appBar: AppBar(title: Text('Форма добавления')),
       body: Container(
@@ -47,10 +48,8 @@ class _TaskFormWidgetBody extends StatelessWidget {
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Enter the description'),
-                onEditingComplete: () =>
-                    TaskModelProvider.read(context)?.notifier?.text,
-                onChanged: (value) =>
-                    TaskModelProvider.read(context)?.notifier?.text = value),
+                onEditingComplete: () => taskModel?.text,
+                onChanged: (value) => taskModel?.text = value),
             SizedBox(height: 20),
             TextButton(
               style: ButtonStyle(
@@ -58,8 +57,7 @@ class _TaskFormWidgetBody extends StatelessWidget {
                       EdgeInsets.symmetric(vertical: 15)),
                   backgroundColor:
                       MaterialStatePropertyAll(Color.fromRGBO(46, 46, 46, 1))),
-              onPressed: () =>
-                  TaskModelProvider.read(context)?.notifier?.addTask(context),
+              onPressed: () => taskModel?.addTask(context),
               child: Text(
                 'Добавить',
                 style: TextStyle(color: Colors.white, fontSize: 18),
