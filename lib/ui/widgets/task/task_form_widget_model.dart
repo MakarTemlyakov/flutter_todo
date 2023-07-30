@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:todo_list/domain/Group.dart';
 import 'package:todo_list/domain/Task.dart';
+import 'package:todo_list/domain/data_provider/box_manager.dart';
 
 class TaskModel with ChangeNotifier {
   final int groupKey;
-  var text = '';
+  String _text = '';
+  String get textTask => _text;
+  set textTask(String value) {
+    final isTaslTextIsEmpty = _text.trim().isEmpty;
+    _text = value;
+    if (value.trim().isEmpty != isTaslTextIsEmpty) {
+      notifyListeners();
+    }
+  }
+
+  bool get isValid => _text.trim().isNotEmpty;
+
   bool isDone = false;
   TaskModel({required this.groupKey});
 
   void addTask(BuildContext context) async {
+    var text = _text.trim();
     if (text.isEmpty) return;
-    if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(GroupAdapter());
-    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(TaskAdapter());
-    final groupBox = await Hive.openBox<Group>('groups');
-    final taskBox = await Hive.openBox<Task>('tasks');
     final task = Task(description: text, isDone: isDone);
-
-    await taskBox.add(task);
-
-    final group = groupBox.get(groupKey);
-    group?.addTask(taskBox, task);
+    final box = await BoxManager.instance.openTaskBox(groupKey);
+    await box.add(task);
 
     Navigator.of(context).pop();
   }

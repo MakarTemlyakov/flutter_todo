@@ -1,52 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_list/domain/Task.dart';
-import 'package:todo_list/widgets/tasks/task/task_widget_list_model.dart';
+import 'package:todo_list/ui/widgets/tasks/task/task_widget_list_model.dart';
+
+class TaskWidgetModelSettings {
+  int groupKey;
+  final String title;
+  TaskWidgetModelSettings({required this.groupKey, required this.title});
+}
 
 class TaskWidgetScreen extends StatefulWidget {
-  const TaskWidgetScreen({super.key});
+  final TaskWidgetModelSettings settings;
+  const TaskWidgetScreen({super.key, required this.settings});
 
   @override
   State<TaskWidgetScreen> createState() => _TaskWidgetScreenState();
 }
 
 class _TaskWidgetScreenState extends State<TaskWidgetScreen> {
-  TaskListModel? _model;
+  late final TaskListModel _model;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (_model == null) {
-      final groupKey = ModalRoute.of(context)!.settings.arguments as int;
-      _model = TaskListModel(groupKey: groupKey);
-    }
+  void initState() {
+    super.initState();
+    _model = TaskListModel(settings: widget.settings);
   }
 
   @override
   Widget build(BuildContext context) {
-    return TaskListModelProvider(model: _model!, child: TaskWidgetList());
+    return TaskListModelProvider(model: _model, child: const TaskWidgetList());
   }
+
+  // @override
+  // void dispose() async {
+  //   await _model.dispose();
+  //   super.dispose();
+  // }
 }
 
 class TaskWidgetList extends StatelessWidget {
-  TaskWidgetList({Key? key}) : super(key: key);
+  const TaskWidgetList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final model = TaskListModelProvider.of(context)?.notifier;
 
-    final groupName = model?.group?.name ?? 'Задачи';
+    final groupName = model?.settings.title ?? 'Задачи';
     return Scaffold(
         appBar: AppBar(
             title: Text(groupName),
-            backgroundColor: Color.fromRGBO(36, 36, 36, 1)),
-        backgroundColor: Color.fromRGBO(36, 36, 36, 1),
-        body: _TaskWidgetListBody(),
+            backgroundColor: const Color.fromRGBO(36, 36, 36, 1)),
+        backgroundColor: const Color.fromRGBO(36, 36, 36, 1),
+        body: const _TaskWidgetListBody(),
         floatingActionButton: FloatingActionButton(
           onPressed: () => model?.redirectToForm(context),
-          child: Icon(Icons.add),
-          backgroundColor: Color.fromRGBO(46, 46, 46, 1),
+          backgroundColor: const Color.fromRGBO(46, 46, 46, 1),
+          child: const Icon(Icons.add),
         ));
   }
 }
@@ -66,7 +75,7 @@ class _TaskWidgetListBody extends StatelessWidget {
           );
         },
         separatorBuilder: (BuildContext context, int index) {
-          return Divider(
+          return const Divider(
             height: 15,
           );
         });
@@ -75,20 +84,20 @@ class _TaskWidgetListBody extends StatelessWidget {
 
 class _TaskWidgetRow extends StatelessWidget {
   final int indexInList;
-  _TaskWidgetRow({Key? key, required this.indexInList}) : super(key: key);
+  const _TaskWidgetRow({Key? key, required this.indexInList}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final model = TaskListModelProvider.of(context)?.notifier;
     final task =
         model?.tasks[indexInList] ?? Task(description: '1', isDone: false);
-    final iconStatus = model?.group?.tasks?[indexInList].isDone == true
-        ? Icon(Icons.done)
+    final iconStatus = model?.tasks[indexInList].isDone == true
+        ? const Icon(Icons.done)
         : null;
     return Slidable(
       key: ValueKey(indexInList),
       endActionPane: ActionPane(
-        motion: ScrollMotion(),
+        motion: const ScrollMotion(),
         children: [
           SlidableAction(
             onPressed: (BuildContext context) => model?.deleteTask(indexInList),
@@ -97,7 +106,7 @@ class _TaskWidgetRow extends StatelessWidget {
             icon: Icons.delete,
             label: 'Revome',
           ),
-          SlidableAction(
+          const SlidableAction(
             onPressed: null,
             backgroundColor: Color(0xFF0392CF),
             foregroundColor: Colors.white,
@@ -110,13 +119,13 @@ class _TaskWidgetRow extends StatelessWidget {
         child: InkWell(
           onDoubleTap: () => model?.toggleStatus(indexInList),
           child: ColoredBox(
-            color: Color.fromRGBO(46, 46, 46, 1),
+            color: const Color.fromRGBO(46, 46, 46, 1),
             child: ListTile(
                 onTap: () => model?.redirectToForm(context),
                 trailing: iconStatus,
-                iconColor: Color.fromRGBO(132, 132, 132, 0.50),
+                iconColor: const Color.fromRGBO(132, 132, 132, 0.50),
                 title: Text(task.description,
-                    style: TextStyle(color: Colors.white))),
+                    style: const TextStyle(color: Colors.white))),
           ),
         ),
       ),

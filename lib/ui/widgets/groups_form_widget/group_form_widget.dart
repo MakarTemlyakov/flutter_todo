@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/widgets/groups_form_widget/goup_form_widget_model.dart';
+import 'package:todo_list/ui/widgets/groups_form_widget/goup_form_widget_model.dart';
 
 class GroupFormWidget extends StatefulWidget {
   const GroupFormWidget({Key? key}) : super(key: key);
@@ -13,39 +13,43 @@ class _GroupFormWidgetState extends State<GroupFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return GroupFormModelProvider(model: _model, child: _GroupFormWidgetBody());
+    return GroupFormModelProvider(
+        model: _model, child: const _GroupFormWidgetBody());
   }
 }
 
 class _GroupFormWidgetBody extends StatelessWidget {
-  _GroupFormWidgetBody({super.key});
+  const _GroupFormWidgetBody({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final model = GroupFormModelProvider.read(context)?.model;
+    final model = GroupFormModelProvider.watch(context)?.model;
+    var error = model?.errorMessage;
     return Scaffold(
-      appBar: AppBar(title: Text('Форма добавления')),
+      appBar: AppBar(title: const Text('Форма добавления')),
       body: Container(
-        padding: EdgeInsets.all(40),
+        padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: 'Enter name group'),
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter name group',
+                  errorText: error),
               onEditingComplete: () => model?.save(context),
               onChanged: (value) => model?.groupName = value,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextButton(
-              style: ButtonStyle(
+              style: const ButtonStyle(
                   padding: MaterialStatePropertyAll(
                       EdgeInsets.symmetric(vertical: 15)),
                   backgroundColor:
                       MaterialStatePropertyAll(Color.fromRGBO(46, 46, 46, 1))),
               onPressed: () => model?.save(context),
-              child: Text(
+              child: const Text(
                 'Добавить',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:todo_list/widgets/groups/groups_widget_model.dart';
-import 'package:todo_list/widgets/groups_form_widget/goup_form_widget_model.dart';
+import 'package:todo_list/ui/widgets/groups/groups_widget_model.dart';
 
 class GroupsWidgetList extends StatefulWidget {
   const GroupsWidgetList({Key? key}) : super(key: key);
@@ -18,6 +17,12 @@ class _GroupsWidgetListState extends State<GroupsWidgetList> {
       model: model,
       child: GroupsWidget(),
     );
+  }
+
+  @override
+  void dispose() async {
+    await model.dispose();
+    super.dispose();
   }
 }
 
